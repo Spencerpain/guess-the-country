@@ -8,34 +8,89 @@
 </head>
 <body>
   <div id="app">
-    <header>
+
+    <!-- Setup Screen -->
+    <div id="setup-screen">
       <h1>Guess the Country</h1>
-      <div id="score-board">
-        <span>Score: <strong id="score">0</strong></span>
-        <span>Round: <strong id="round">1</strong> / <strong id="total-rounds">10</strong></span>
-      </div>
-    </header>
+      <p class="subtitle">A country is highlighted on the map — can you name it?</p>
 
-    <main>
-      <div id="map-container">
-        <!-- SVG world map will be loaded here -->
-        <svg id="world-map" viewBox="0 0 2000 1000" xmlns="http://www.w3.org/2000/svg"></svg>
-      </div>
-
-      <div id="question-panel">
-        <p id="prompt">Find this country on the map:</p>
-        <h2 id="country-name">—</h2>
-        <div id="feedback"></div>
+      <div class="setup-section">
+        <h3>Difficulty</h3>
+        <div class="btn-group" id="difficulty-group">
+          <button class="opt-btn active" data-value="easy">Easy</button>
+          <button class="opt-btn" data-value="medium">Medium</button>
+          <button class="opt-btn" data-value="hard">Hard</button>
+          <button class="opt-btn" data-value="impossible">Impossible</button>
+        </div>
+        <p id="difficulty-desc" class="hint">Large, very well-known countries</p>
       </div>
 
-      <div id="result-screen" class="hidden">
-        <h2>Game Over!</h2>
-        <p>Final score: <strong id="final-score"></strong> / <strong id="final-total"></strong></p>
+      <div class="setup-section">
+        <h3>Quiz Length</h3>
+        <div class="btn-group" id="length-group">
+          <button class="opt-btn active" data-value="10">10</button>
+          <button class="opt-btn" data-value="15">15</button>
+          <button class="opt-btn" data-value="25">25</button>
+          <button class="opt-btn" data-value="50">50</button>
+        </div>
+      </div>
+
+      <button id="start-btn" disabled>Loading map…</button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden">
+      <header>
+        <h1>Guess the Country</h1>
+        <div id="score-board">
+          <span>Round: <strong id="round">1</strong> / <strong id="total-rounds">10</strong></span>
+          <span>Score: <strong id="score">0</strong></span>
+        </div>
+      </header>
+
+      <main>
+        <div id="map-container">
+          <svg id="world-map" viewBox="0 0 2000 1000" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+
+        <div id="question-panel">
+          <p id="prompt">Which country is highlighted in orange?</p>
+          <h2 id="country-name" class="hidden">—</h2>
+          <div id="action-area">
+            <button id="reveal-btn">Reveal Answer</button>
+            <div id="self-score-btns" class="hidden">
+              <button id="correct-btn" class="score-btn correct-btn">&#10003; Got it right</button>
+              <button id="wrong-btn" class="score-btn wrong-btn">&#10007; Got it wrong</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen" class="hidden">
+      <div class="result-card">
+        <h2>Quiz Complete!</h2>
+        <div class="result-stats">
+          <div class="stat">
+            <span class="stat-num" id="final-score">0</span>
+            <span class="stat-label">Correct</span>
+          </div>
+          <span class="stat-divider">/</span>
+          <div class="stat">
+            <span class="stat-num" id="final-total">0</span>
+            <span class="stat-label">Total</span>
+          </div>
+          <div class="stat percent">
+            <span class="stat-num" id="final-percent">0%</span>
+            <span class="stat-label">Accuracy</span>
+          </div>
+        </div>
         <button id="play-again">Play Again</button>
       </div>
-    </main>
-  </div>
+    </div>
 
+  </div>
   <script src="game.js"></script>
 </body>
 </html>
