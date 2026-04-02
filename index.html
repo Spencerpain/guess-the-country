@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guess the Country</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Guess the Country</h1>
+      <div id="score-board">
+        <span>Score: <strong id="score">0</strong></span>
+        <span>Round: <strong id="round">1</strong> / <strong id="total-rounds">10</strong></span>
+      </div>
+    </header>
+
+    <main>
+      <div id="map-container">
+        <!-- SVG world map will be loaded here -->
+        <svg id="world-map" viewBox="0 0 2000 1000" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+
+      <div id="question-panel">
+        <p id="prompt">Find this country on the map:</p>
+        <h2 id="country-name">—</h2>
+        <div id="feedback"></div>
+      </div>
+
+      <div id="result-screen" class="hidden">
+        <h2>Game Over!</h2>
+        <p>Final score: <strong id="final-score"></strong> / <strong id="final-total"></strong></p>
+        <button id="play-again">Play Again</button>
+      </div>
+    </main>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
