@@ -144,6 +144,62 @@ function featureToD(geometry) {
   return rings.map(ringToD).join(' ');
 }
 
+// ── Zoom / viewBox animation ──────────────────────────────────────────────────
+
+let vb = { x: 0, y: 0, w: 2000, h: 1000 }; // current rendered viewBox
+let animFrame = null;
+
+function zoomToCountry(pathEl) {
+  const bbox = pathEl.getBBox();
+  const size = Math.max(bbox.width, bbox.height);
+
+  // Padding: large countries get less relative padding, tiny ones get more
+  const pad = Math.max(180, Math.min(size * 3, 700));
+
+  let vx = bbox.x - pad;
+  let vy = bbox.y - pad;
+  let vw = bbox.width  + pad * 2;
+  let vh = bbox.height + pad * 2;
+
+  // Force 2:1 aspect ratio to match the SVG coordinate space
+  if (vw / vh > 2) {
+    const newH = vw / 2;
+    vy -= (newH - vh) / 2;
+    vh = newH;
+  } else {
+    const newW = vh * 2;
+    vx -= (newW - vw) / 2;
+    vw = newW;
+  }
+
+  // Clamp to world bounds
+  vw = Math.min(vw, 2000);
+  vh = Math.min(vh, 1000);
+  vx = Math.max(0, Math.min(vx, 2000 - vw));
+  vy = Math.max(0, Math.min(vy, 1000 - vh));
+
+  animateViewBox({ x: vx, y: vy, w: vw, h: vh });
+}
+
+function resetZoom() {
+  animateViewBox({ x: 0, y: 0, w: 2000, h: 1000 });
+}
+
+function animateViewBox(target) {
+  if (animFrame) cancelAnimationFrame(animFrame);
+  function step() {
+    const t = 0.14;
+    vb.x += (target.x - vb.x) * t;
+    vb.y += (target.y - vb.y) * t;
+    vb.w += (target.w - vb.w) * t;
+    vb.h += (target.h - vb.h) * t;
+    svg.setAttribute('viewBox', `${vb.x.toFixed(1)} ${vb.y.toFixed(1)} ${vb.w.toFixed(1)} ${vb.h.toFixed(1)}`);
+    const done = Math.abs(target.x - vb.x) < 0.5 && Math.abs(target.w - vb.w) < 0.5;
+    animFrame = done ? null : requestAnimationFrame(step);
+  }
+  animFrame = requestAnimationFrame(step);
+}
+
 // ── Utility ───────────────────────────────────────────────────────────────────
 
 function shuffle(arr) {
@@ -278,6 +334,7 @@ function nextRound() {
   currentCountry = queue[round++];
   roundEl.textContent = round;
   currentCountry.classList.add('target');
+  zoomToCountry(currentCountry);
 }
 
 revealBtn.addEventListener('click', () => {
@@ -310,8 +367,8 @@ function endGame() {
 
 playAgainBtn.addEventListener('click', () => {
   resultScreen.classList.add('hidden');
-  // Clean up map state before returning to setup
   svg.querySelectorAll('path').forEach(p => p.classList.remove('target'));
+  resetZoom();
   setupScreen.classList.remove('hidden');
 });
 
