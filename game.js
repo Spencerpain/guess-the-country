@@ -154,7 +154,7 @@ function zoomToCountry(pathEl) {
   const size = Math.max(bbox.width, bbox.height);
 
   // Padding: large countries get less relative padding, tiny ones get more
-  const pad = Math.max(180, Math.min(size * 3, 700));
+  const pad = Math.max(50, Math.min(size * 0.8, 200));
 
   let vx = bbox.x - pad;
   let vy = bbox.y - pad;
