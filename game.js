@@ -90,11 +90,59 @@ const DIFFICULTY_POOLS = {
   ]),
 };
 
+// Random = union of all pools
+DIFFICULTY_POOLS.random = new Set([
+  ...DIFFICULTY_POOLS.easy,
+  ...DIFFICULTY_POOLS.medium,
+  ...DIFFICULTY_POOLS.hard,
+  ...DIFFICULTY_POOLS.impossible,
+]);
+
 const DIFFICULTY_HINTS = {
   easy:       'Large, very well-known countries',
   medium:     'Common world geography',
   hard:       'All countries — every continent',
   impossible: 'Tiny & obscure territories',
+  random:     'Any country — mix of all difficulties!',
+};
+
+// ── Continent mapping (used for zoom) ─────────────────────────────────────────
+// Russia assigned to AS so Europe's bbox stays tight
+
+const COUNTRY_CONTINENT = {
+  // Africa
+  AO:'AF', BJ:'AF', BW:'AF', BF:'AF', BI:'AF', CM:'AF', CV:'AF', CF:'AF',
+  TD:'AF', KM:'AF', CD:'AF', CG:'AF', CI:'AF', DJ:'AF', EG:'AF', GQ:'AF',
+  ER:'AF', ET:'AF', GA:'AF', GM:'AF', GH:'AF', GN:'AF', GW:'AF', KE:'AF',
+  LS:'AF', LR:'AF', LY:'AF', MG:'AF', MW:'AF', ML:'AF', MR:'AF', MU:'AF',
+  MA:'AF', MZ:'AF', NA:'AF', NE:'AF', NG:'AF', RW:'AF', SN:'AF', SL:'AF',
+  SO:'AF', ZA:'AF', SS:'AF', SD:'AF', SZ:'AF', TZ:'AF', TG:'AF', TN:'AF',
+  UG:'AF', ZM:'AF', ZW:'AF', DZ:'AF',
+  // Asia (includes Russia to keep Europe bbox tight)
+  AF:'AS', AM:'AS', AZ:'AS', BH:'AS', BD:'AS', BT:'AS', BN:'AS', KH:'AS',
+  CN:'AS', CY:'AS', GE:'AS', IN:'AS', ID:'AS', IR:'AS', IQ:'AS', IL:'AS',
+  JP:'AS', JO:'AS', KZ:'AS', KW:'AS', KG:'AS', LA:'AS', LB:'AS', MY:'AS',
+  MV:'AS', MN:'AS', MM:'AS', NP:'AS', KP:'AS', OM:'AS', PK:'AS', PH:'AS',
+  QA:'AS', RU:'AS', SA:'AS', SG:'AS', KR:'AS', LK:'AS', SY:'AS', TW:'AS',
+  TJ:'AS', TH:'AS', TL:'AS', TR:'AS', TM:'AS', AE:'AS', UZ:'AS', VN:'AS',
+  YE:'AS',
+  // Europe
+  AL:'EU', AD:'EU', AT:'EU', BY:'EU', BE:'EU', BA:'EU', BG:'EU', HR:'EU',
+  CZ:'EU', DK:'EU', EE:'EU', FI:'EU', FR:'EU', DE:'EU', GR:'EU', HU:'EU',
+  IS:'EU', IE:'EU', IT:'EU', LV:'EU', LI:'EU', LT:'EU', LU:'EU', MT:'EU',
+  MD:'EU', MC:'EU', ME:'EU', NL:'EU', MK:'EU', NO:'EU', PL:'EU', PT:'EU',
+  RO:'EU', SM:'EU', RS:'EU', SK:'EU', SI:'EU', ES:'EU', SE:'EU', CH:'EU',
+  UA:'EU', GB:'EU',
+  // North America
+  BS:'NA', BB:'NA', BZ:'NA', CA:'NA', CR:'NA', CU:'NA', DM:'NA', DO:'NA',
+  SV:'NA', GD:'NA', GT:'NA', HT:'NA', HN:'NA', JM:'NA', MX:'NA', NI:'NA',
+  PA:'NA', KN:'NA', LC:'NA', TT:'NA', US:'NA',
+  // South America
+  AR:'SA', BO:'SA', BR:'SA', CL:'SA', CO:'SA', EC:'SA', FK:'SA', GY:'SA',
+  PY:'SA', PE:'SA', SR:'SA', UY:'SA', VE:'SA',
+  // Oceania
+  AU:'OC', FJ:'OC', KI:'OC', MH:'OC', FM:'OC', NR:'OC', NZ:'OC', PW:'OC',
+  PG:'OC', WS:'OC', SB:'OC', TO:'OC', TV:'OC', VU:'OC',
 };
 
 // ── UN M49 numeric → ISO alpha-2 ──────────────────────────────────────────────
@@ -150,16 +198,33 @@ let vb = { x: 0, y: 0, w: 2000, h: 1000 }; // current rendered viewBox
 let animFrame = null;
 
 function zoomToCountry(pathEl) {
-  const bbox = pathEl.getBBox();
-  const size = Math.max(bbox.width, bbox.height);
+  const iso = pathEl.dataset.iso;
+  const continent = COUNTRY_CONTINENT[iso];
 
-  // Padding: large countries get less relative padding, tiny ones get more
-  const pad = Math.max(50, Math.min(size * 0.8, 200));
+  // Compute the bounding box of all countries in the same continent
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
 
-  let vx = bbox.x - pad;
-  let vy = bbox.y - pad;
-  let vw = bbox.width  + pad * 2;
-  let vh = bbox.height + pad * 2;
+  if (continent) {
+    svg.querySelectorAll('path[data-iso]').forEach(p => {
+      if (COUNTRY_CONTINENT[p.dataset.iso] === continent) {
+        const b = p.getBBox();
+        minX = Math.min(minX, b.x);
+        minY = Math.min(minY, b.y);
+        maxX = Math.max(maxX, b.x + b.width);
+        maxY = Math.max(maxY, b.y + b.height);
+      }
+    });
+  } else {
+    // Fallback: zoom to the country itself with generous padding
+    const b = pathEl.getBBox();
+    minX = b.x; minY = b.y; maxX = b.x + b.width; maxY = b.y + b.height;
+  }
+
+  const pad = 40;
+  let vx = minX - pad;
+  let vy = minY - pad;
+  let vw = (maxX - minX) + pad * 2;
+  let vh = (maxY - minY) + pad * 2;
 
   // Force 2:1 aspect ratio to match the SVG coordinate space
   if (vw / vh > 2) {
