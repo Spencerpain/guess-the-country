@@ -5,7 +5,7 @@
 }
 
 body {
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: "Segoe UI", system-ui, sans-serif;
   background: #1a1a2e;
   color: #eee;
   min-height: 100vh;
@@ -19,7 +19,7 @@ body {
   height: 100vh;
 }
 
-/* ── Setup Screen ─────────────────────────────────────── */
+/* Setup Screen */
 #setup-screen {
   display: flex;
   flex-direction: column;
@@ -40,6 +40,7 @@ body {
   color: #aaa;
   font-size: 1rem;
   margin-top: -16px;
+  text-align: center;
 }
 
 .setup-section {
@@ -60,6 +61,7 @@ body {
   font-size: 0.82rem;
   color: #666;
   font-style: italic;
+  text-align: center;
 }
 
 .btn-group {
@@ -79,6 +81,7 @@ body {
   cursor: pointer;
   transition: all 0.15s;
   font-weight: 500;
+  min-height: 44px;
 }
 
 .opt-btn:hover {
@@ -104,12 +107,13 @@ body {
   transition: background 0.2s, opacity 0.2s;
   letter-spacing: 0.04em;
   margin-top: 8px;
+  min-height: 48px;
 }
 
 #start-btn:hover:not(:disabled) { background: #c73652; }
 #start-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-/* ── Game Screen ──────────────────────────────────────── */
+/* Game Screen */
 #game-screen {
   display: flex;
   flex-direction: column;
@@ -149,6 +153,7 @@ main {
   padding: 16px;
   gap: 14px;
   overflow: hidden;
+  min-height: 0;
 }
 
 #map-container {
@@ -158,15 +163,16 @@ main {
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #0f3460;
+  flex: 1;
+  min-height: 0;
 }
 
 #world-map {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
 }
 
-/* All country paths — no hover, no cursor, just shapes */
 #world-map path {
   fill: #2e4a7a;
   stroke: #1a1a2e;
@@ -174,20 +180,20 @@ main {
   pointer-events: none;
 }
 
-/* Highlighted target country */
 #world-map path.target {
   fill: #f39c12;
   stroke: #fff;
   stroke-width: 1;
 }
 
-/* ── Question Panel ───────────────────────────────────── */
+/* Question Panel */
 #question-panel {
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 #prompt {
@@ -224,6 +230,7 @@ main {
   cursor: pointer;
   font-weight: 600;
   transition: background 0.2s, border-color 0.2s;
+  min-height: 44px;
 }
 
 #reveal-btn:hover {
@@ -244,6 +251,7 @@ main {
   cursor: pointer;
   font-weight: 700;
   transition: opacity 0.15s, transform 0.1s;
+  min-height: 44px;
 }
 
 .score-btn:hover {
@@ -254,7 +262,7 @@ main {
 .correct-btn { background: #27ae60; color: #fff; }
 .wrong-btn   { background: #e74c3c; color: #fff; }
 
-/* ── Result Screen ────────────────────────────────────── */
+/* Result Screen */
 #result-screen {
   position: fixed;
   inset: 0;
@@ -263,6 +271,7 @@ main {
   align-items: center;
   justify-content: center;
   z-index: 100;
+  padding: 16px;
 }
 
 .result-card {
@@ -276,6 +285,8 @@ main {
   align-items: center;
   gap: 28px;
   box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+  width: 100%;
+  max-width: 480px;
 }
 
 .result-card h2 {
@@ -332,8 +343,117 @@ main {
   cursor: pointer;
   font-weight: 600;
   transition: background 0.2s;
+  min-height: 44px;
 }
 
 #play-again:hover { background: #c73652; }
 
 .hidden { display: none !important; }
+
+/* Mobile */
+@media (max-width: 600px) {
+  #setup-screen {
+    gap: 18px;
+    padding: 20px 16px;
+    justify-content: center;
+  }
+
+  #setup-screen h1 {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 0.88rem;
+  }
+
+  .opt-btn {
+    padding: 9px 14px;
+    font-size: 0.88rem;
+  }
+
+  #start-btn {
+    width: 100%;
+    max-width: 280px;
+    font-size: 1rem;
+    padding: 14px 24px;
+  }
+
+  header {
+    padding: 8px 12px;
+  }
+
+  header h1 {
+    font-size: 1rem;
+  }
+
+  #score-board {
+    gap: 12px;
+    font-size: 0.82rem;
+  }
+
+  main {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  #map-container {
+    border-radius: 8px;
+  }
+
+  #question-panel {
+    gap: 6px;
+  }
+
+  #prompt {
+    font-size: 0.8rem;
+  }
+
+  #country-name {
+    font-size: 1.5rem;
+  }
+
+  #reveal-btn {
+    padding: 11px 28px;
+    font-size: 0.95rem;
+  }
+
+  #self-score-btns {
+    gap: 8px;
+  }
+
+  .score-btn {
+    padding: 11px 18px;
+    font-size: 0.9rem;
+  }
+
+  .result-card {
+    padding: 28px 20px;
+    gap: 20px;
+    border-radius: 14px;
+  }
+
+  .result-card h2 {
+    font-size: 1.5rem;
+  }
+
+  .result-stats {
+    gap: 12px;
+  }
+
+  .stat-num {
+    font-size: 2rem;
+  }
+
+  .stat.percent .stat-num {
+    font-size: 2.4rem;
+  }
+
+  .stat-divider {
+    font-size: 1.6rem;
+  }
+
+  #play-again {
+    width: 100%;
+    max-width: 240px;
+  }
+}
